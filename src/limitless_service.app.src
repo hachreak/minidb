@@ -5,7 +5,8 @@
   {mod, { limitless_service_app, []}},
   {applications,
    [kernel,
-    stdlib
+    stdlib,
+    riak_core
    ]},
   {env,[]},
   {modules, []},

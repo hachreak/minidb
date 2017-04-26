@@ -28,7 +28,11 @@ start_link() ->
 
 %% Child :: {Id,StartFunc,Restart,Shutdown,Type,Modules}
 init([]) ->
-    {ok, { {one_for_all, 0, 1}, []} }.
+    VMaster = {
+      limitless_service_vnode_master,
+      {riak_core_vnode_master, start_link, [limitless_service_vnode]},
+      permanent, 5000, worker, [riak_core_vnode_master]},
+    {ok, {{one_for_one, 5, 10}, [VMaster]}}.
 
 %%====================================================================
 %% Internal functions
