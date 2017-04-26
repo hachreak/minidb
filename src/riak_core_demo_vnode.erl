@@ -1,4 +1,4 @@
--module(limitless_service_vnode).
+-module(riak_core_demo_vnode).
 -behaviour(riak_core_vnode).
 
 -export([

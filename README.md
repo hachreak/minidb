@@ -1,4 +1,4 @@
-limitless_service
+riak_core_demo
 =====
 
 An OTP application
@@ -15,14 +15,14 @@ Start the first node:
 
 ```bash
 rebar3 shell --name test1@127.0.0.1 --config config/vars_dev1.config
-1> application:ensure_all_started(limitless_service).
+1> application:ensure_all_started(riak_core_demo).
 ```
 
 Start the second node:
 
 ```bash
 rebar3 shell --name test2@127.0.0.1 --config config/vars_dev2.config
-1> application:ensure_all_started(limitless_service).
+1> application:ensure_all_started(riak_core_demo).
 ```
 
 Join the two nodes together (run from the first node):
@@ -34,7 +34,7 @@ riak_core:join('test2@127.0.0.1').
 Test the ping:
 
 ```bash
-limitless_service:ping().
+riak_core_demo:ping().
 ```
 
 You should see messages from console like:

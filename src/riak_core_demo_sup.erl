@@ -1,9 +1,9 @@
 %%%-------------------------------------------------------------------
-%% @doc limitless_service top level supervisor.
+%% @doc riak_core_demo top level supervisor.
 %% @end
 %%%-------------------------------------------------------------------
 
--module(limitless_service_sup).
+-module(riak_core_demo_sup).
 
 -behaviour(supervisor).
 
@@ -29,8 +29,8 @@ start_link() ->
 %% Child :: {Id,StartFunc,Restart,Shutdown,Type,Modules}
 init([]) ->
     VMaster = {
-      limitless_service_vnode_master,
-      {riak_core_vnode_master, start_link, [limitless_service_vnode]},
+      riak_core_demo_vnode_master,
+      {riak_core_vnode_master, start_link, [riak_core_demo_vnode]},
       permanent, 5000, worker, [riak_core_vnode_master]},
     {ok, {{one_for_one, 5, 10}, [VMaster]}}.
 
