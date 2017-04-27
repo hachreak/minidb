@@ -33,13 +33,16 @@ rebar3 shell --name test2@127.0.0.1 --config config/vars_dev2.config
 
 Join the two nodes together (run from the first node):
 
-```bash
+```erlang
 2> riak_core:join('test2@127.0.0.1').
 ```
 
+Ping
+----
+
 Test the ping (you can run from both nodes):
 
-```bash
+```erlang
 3> riak_core_demo:ping().
 ```
 
@@ -50,3 +53,38 @@ You should see messages from console like:
 and in one of the two nodes (it's pseudo random) a message like:
 
 `[ping received] from ...`
+
+Get/Put values in the store
+---------------------------
+
+```erlang
+riak_core_demo:put(a, 1).
+riak_core_demo:put(b, 2).
+...
+riak_core_demo:get(a).
+riak_core_demo:get(b).
+```
+
+Handoff
+-------
+
+After you insert many data in the storeTest the store, just try to disconnect
+the second node from the cluster:
+
+```erlang
+riak_core:leave().
+```
+
+In the console you should be able to see the different messages.
+Automatically, all information stored in the second node will be transfered
+to the first node.
+
+To reconnect again the second node, simply:
+
+```erlang
+application:ensure_all_started(riak_core_demo).
+riak_core:join('test1@127.0.0.1').
+```
+
+Again, you will see the handoff of some process from the first node and
+part of the data will be transfered to the second node.

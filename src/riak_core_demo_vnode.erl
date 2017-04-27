@@ -24,6 +24,8 @@
   start_vnode/1
 ]).
 
+-include_lib("riak_core/include/riak_core_vnode.hrl").
+
 -record(state, {partition, data}).
 
 %% API
@@ -53,29 +55,47 @@ handle_command(Message, _Sender, State) ->
   lager:warning("unhandled_command ~p", [Message]),
   {noreply, State}.
 
-handle_handoff_command(_Message, _Sender, State) ->
+handle_handoff_command(?FOLD_REQ{foldfun=FoldFun, acc0=Acc0}, _Sender,
+                       State=#state{partition=Partition, data=Data}) ->
+  error_logger:info_msg("[handoff v2] partition ~p~n", [Partition]),
+  AccFinal = maps:fold(fun(Key, Value, Acc) ->
+      FoldFun(Key, Value, Acc)
+    end, Acc0, Data),
+  {reply, AccFinal, State};
+handle_handoff_command(Message, Sender, State) ->
+  error_logger:info_msg("[handoff generic request]"),
+  handle_command(Message, Sender, State),
   {noreply, State}.
 
-handoff_starting(_TargetNode, State) ->
+handoff_starting(TargetNode, State) ->
+  error_logger:info_msg("[Handoff] started from ~p~n", [TargetNode]),
+  % return false if you want to postpone the procedure
   {true, State}.
 
 handoff_cancelled(State) ->
   {ok, State}.
 
-handoff_finished(_TargetNode, State) ->
+handoff_finished(TargetNode, State) ->
+  error_logger:info_msg("[Handoff] finish from ~p~n", [TargetNode]),
   {ok, State}.
 
-handle_handoff_data(_Data, State) ->
-  {reply, ok, State}.
+handle_handoff_data(BinaryData, State=#state{data=Data}) ->
+  % Receive handoff data from the node that is switched off and decode it
+  {Key, Value} = erlang:binary_to_term(BinaryData),
+  {reply, ok, State#state{data=Data#{Key => Value}}}.
 
-encode_handoff_item(_ObjectName, _ObjectValue) ->
-  <<>>.
+encode_handoff_item(Key, Value) ->
+  % encode the data in a format that can be then transferred and then decoded
+  % on other nodes.
+  erlang:term_to_binary({Key, Value}).
 
-is_empty(State) ->
-  {true, State}.
+is_empty(State=#state{data=Data}) ->
+  % if true, the handoff procedure is started!
+  {maps:size(Data) =:= 0, State}.
 
 delete(State) ->
-  {ok, State}.
+  % called before the termination of the vnode and is used to clean the data
+  {ok, State#state{data=#{}}}.
 
 handle_coverage(_Req, _KeySpaces, _Sender, State) ->
   {stop, not_implemented, State}.
