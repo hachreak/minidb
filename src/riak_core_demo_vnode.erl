@@ -24,14 +24,14 @@
   start_vnode/1
 ]).
 
--record(state, {partition}).
+-record(state, {partition, data}).
 
 %% API
 start_vnode(I) ->
   riak_core_vnode_master:get_vnode_pid(I, ?MODULE).
 
 init([Partition]) ->
-  {ok, #state { partition=Partition }}.
+  {ok, #state { partition=Partition, data=#{}}}.
 
 handle_overload_command(_, _, _) ->
   lager:warning("[VNODE] Overload command!~n").
@@ -41,8 +41,14 @@ handle_overload_info(_, _) ->
 
 %% Sample command: respond to a ping
 handle_command(ping, Sender, State) ->
-  error_logger:error_msg("[ping received] from ~p~n", [Sender]),
+  error_logger:info_msg("[ping received] from ~p~n", [Sender]),
   {reply, {pong, State#state.partition}, State};
+handle_command({put, {Key, Value}}, _Sender, State=#state{data=Data}) ->
+  error_logger:info_msg("[put] ~p -> ~p~n", [Key, Value]),
+  {noreply, State#state{data=Data#{Key => Value}}};
+handle_command({get, Key}, _Sender, State=#state{data=Data}) ->
+  error_logger:info_msg("[get] ~p~n", [Key]),
+  {reply, maps:get(Key, Data), State};
 handle_command(Message, _Sender, State) ->
   lager:warning("unhandled_command ~p", [Message]),
   {noreply, State}.
