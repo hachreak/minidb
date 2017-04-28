@@ -5,7 +5,7 @@
 
 -module(riak_core_demo).
 
--export([ping/0, put/2, get/1, keys/0, values/0]).
+-export([ping/0, put/2, get/1, keys/0, values/0, status/0]).
 
 %%====================================================================
 %% API
@@ -31,6 +31,11 @@ keys() ->
 values() ->
   ReqId = riak_core_demo_coverage_fsm_sup:start_fsm(values),
   wait_result(ReqId).
+
+status() ->
+  % show the ring status.
+  {ok, Ring} = riak_core_ring_manager:get_my_ring(),
+  riak_core_ring:pretty_print(Ring, [legend]).
 
 %% Private functions
 

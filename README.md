@@ -100,3 +100,12 @@ all nodes or list of values:
 riak_core_demo:keys().
 riak_core_demo:values().
 ```
+
+Cluster status
+--------------
+
+Show cluster status:
+
+```erlang
+riak_core_demo:status().
+```
