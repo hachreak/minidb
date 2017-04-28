@@ -68,7 +68,7 @@ riak_core_demo:get(b).
 Handoff
 -------
 
-After you insert many data in the storeTest the store, just try to disconnect
+After you insert many data in the store, just try to disconnect
 the second node from the cluster:
 
 ```erlang
@@ -88,3 +88,15 @@ riak_core:join('test1@127.0.0.1').
 
 Again, you will see the handoff of some process from the first node and
 part of the data will be transfered to the second node.
+
+
+Coverage commands: keys() and values()
+--------------------------------------
+
+After you insert many data in the store, try to get the list of keys stored in
+all nodes or list of values:
+
+```erlang
+riak_core_demo:keys().
+riak_core_demo:values().
+```

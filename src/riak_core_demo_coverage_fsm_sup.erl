@@ -1,9 +1,9 @@
 %%%-------------------------------------------------------------------
-%% @doc riak_core_demo top level supervisor.
+%% @doc riak_core_demo coverage fsm supervisor.
 %% @end
 %%%-------------------------------------------------------------------
 
--module(riak_core_demo_sup).
+-module(riak_core_demo_coverage_fsm_sup).
 
 -behaviour(supervisor).
 
@@ -13,33 +13,36 @@
 %% Supervisor callbacks
 -export([init/1]).
 
+-export([start_fsm/1]).
+
 -define(SERVER, ?MODULE).
 
 %%====================================================================
 %% API functions
 %%====================================================================
 
+start_fsm(What) ->
+  ReqId = make_reqid(),
+  {ok, _} = supervisor:start_child(?MODULE, [ReqId, self(), What]),
+  ReqId.
+
 start_link() ->
-    supervisor:start_link({local, ?SERVER}, ?MODULE, []).
+  supervisor:start_link({local, ?SERVER}, ?MODULE, []).
 
 %%====================================================================
 %% Supervisor callbacks
 %%====================================================================
 
 %% Child :: {Id,StartFunc,Restart,Shutdown,Type,Modules}
-init([]) ->
-    VMaster = {
-      riak_core_demo_vnode_master,
-      {riak_core_vnode_master, start_link, [riak_core_demo_vnode]},
-      permanent, 5000, worker, [riak_core_vnode_master]},
-
-    CoverageFSMs = {
-      riak_core_demo_coverage_fsm_sup,
-      {riak_core_demo_coverage_fsm_sup, start_link, []},
-      permanent, infinity, supervisor, [riak_core_demo_coverage_fsm_sup]},
-
-    {ok, {{one_for_one, 5, 10}, [VMaster, CoverageFSMs]}}.
+init(_Args) ->
+  CoverageFSM = {
+    riak_core_demo_coverage_fsm,
+    {riak_core_demo_coverage_fsm, start_link, []},
+    temporary, 5000, worker, [riak_core_demo_coverage_fsm]},
+  {ok, {{simple_one_for_one, 5, 10}, [CoverageFSM]}}.
 
 %%====================================================================
 %% Internal functions
 %%====================================================================
+
+make_reqid() -> erlang:phash2(erlang:now()).

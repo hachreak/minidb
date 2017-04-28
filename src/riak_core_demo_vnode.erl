@@ -97,7 +97,19 @@ delete(State) ->
   % called before the termination of the vnode and is used to clean the data
   {ok, State#state{data=#{}}}.
 
-handle_coverage(_Req, _KeySpaces, _Sender, State) ->
+handle_coverage({keys, _, _}=Req, _KeySpaces, {_, RefId, _}=Sender,
+                State=#state{data=Data}) ->
+  error_logger:info_msg(
+    "[handle coverage] vnode keys req ~p sender ~p~n", [Req, Sender]),
+  {reply, {RefId, maps:keys(Data)}, State};
+handle_coverage({values, _, _}=Req, _KeySpaces, {_, RefId, _}=Sender,
+                State=#state{data=Data}) ->
+  error_logger:info_msg(
+    "[handle coverage] vnode values req ~p sender ~p~n", [Req, Sender]),
+  {reply, {RefId, maps:values(Data)}, State};
+handle_coverage(Req, _KeySpaces, _Sender, State) ->
+  error_logger:info_msg(
+    "[handle coverage] Request ~p not implemented!", [Req]),
   {stop, not_implemented, State}.
 
 handle_exit(_Pid, _Reason, State) ->
