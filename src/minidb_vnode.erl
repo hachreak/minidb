@@ -51,6 +51,9 @@ handle_command({put, {Key, Value}}, _Sender, State=#state{data=Data}) ->
 handle_command({get, Key}, _Sender, State=#state{data=Data}) ->
   error_logger:info_msg("[get] ~p~n", [Key]),
   {reply, maps:get(Key, Data), State};
+handle_command({delete, Key}, _Sender, State=#state{data=Data}) ->
+  error_logger:info_msg("[delete] ~p~n", [Key]),
+  {noreply, State#state{data=maps:remove(Key, Data)}};
 handle_command(Message, _Sender, State) ->
   lager:warning("unhandled_command ~p", [Message]),
   {noreply, State}.

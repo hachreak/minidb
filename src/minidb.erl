@@ -5,7 +5,15 @@
 
 -module(minidb).
 
--export([ping/0, put/2, get/1, keys/0, values/0, status/0]).
+-export([
+  delete/1,
+  get/1,
+  keys/0,
+  ping/0,
+  put/2,
+  status/0,
+  values/0
+]).
 
 %%====================================================================
 %% API
@@ -23,6 +31,10 @@ put(Key, Value) ->
 get(Key) ->
   riak_core_vnode_master:sync_command(
     get_node({?MODULE, Key}), {get, Key}, minidb_vnode_master).
+
+delete(Key) ->
+  riak_core_vnode_master:command(
+    get_node({?MODULE, Key}), {delete, Key}, minidb_vnode_master).
 
 keys() ->
   ReqId = minidb_coverage_fsm_sup:start_fsm(keys),
