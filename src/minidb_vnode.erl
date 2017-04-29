@@ -1,4 +1,4 @@
--module(riak_core_demo_vnode).
+-module(minidb_vnode).
 -behaviour(riak_core_vnode).
 
 -export([

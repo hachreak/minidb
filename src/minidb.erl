@@ -1,9 +1,9 @@
 %%%-------------------------------------------------------------------
-%% @doc riak_core_demo public API
+%% @doc minidb public API
 %% @end
 %%%-------------------------------------------------------------------
 
--module(riak_core_demo).
+-module(minidb).
 
 -export([ping/0, put/2, get/1, keys/0, values/0, status/0]).
 
@@ -14,22 +14,22 @@
 ping() ->
   riak_core_vnode_master:sync_command(
     get_node({<<"ping">>, term_to_binary(os:timestamp())}),
-    ping, riak_core_demo_vnode_master).
+    ping, minidb_vnode_master).
 
 put(Key, Value) ->
   riak_core_vnode_master:command(
-    get_node({?MODULE, Key}), {put, {Key, Value}}, riak_core_demo_vnode_master).
+    get_node({?MODULE, Key}), {put, {Key, Value}}, minidb_vnode_master).
 
 get(Key) ->
   riak_core_vnode_master:sync_command(
-    get_node({?MODULE, Key}), {get, Key}, riak_core_demo_vnode_master).
+    get_node({?MODULE, Key}), {get, Key}, minidb_vnode_master).
 
 keys() ->
-  ReqId = riak_core_demo_coverage_fsm_sup:start_fsm(keys),
+  ReqId = minidb_coverage_fsm_sup:start_fsm(keys),
   wait_result(ReqId).
 
 values() ->
-  ReqId = riak_core_demo_coverage_fsm_sup:start_fsm(values),
+  ReqId = minidb_coverage_fsm_sup:start_fsm(values),
   wait_result(ReqId).
 
 status() ->
@@ -41,7 +41,7 @@ status() ->
 
 get_node(RingKey) ->
   DocIdx = riak_core_util:chash_key(RingKey),
-  PrefList = riak_core_apl:get_primary_apl(DocIdx, 1, riak_core_demo),
+  PrefList = riak_core_apl:get_primary_apl(DocIdx, 1, minidb),
   [{IndexNode, _Type}] = PrefList,
   IndexNode.
 

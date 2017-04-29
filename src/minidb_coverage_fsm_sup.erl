@@ -1,9 +1,9 @@
 %%%-------------------------------------------------------------------
-%% @doc riak_core_demo coverage fsm supervisor.
+%% @doc minidb coverage fsm supervisor.
 %% @end
 %%%-------------------------------------------------------------------
 
--module(riak_core_demo_coverage_fsm_sup).
+-module(minidb_coverage_fsm_sup).
 
 -behaviour(supervisor).
 
@@ -36,9 +36,9 @@ start_link() ->
 %% Child :: {Id,StartFunc,Restart,Shutdown,Type,Modules}
 init(_Args) ->
   CoverageFSM = {
-    riak_core_demo_coverage_fsm,
-    {riak_core_demo_coverage_fsm, start_link, []},
-    temporary, 5000, worker, [riak_core_demo_coverage_fsm]},
+    minidb_coverage_fsm,
+    {minidb_coverage_fsm, start_link, []},
+    temporary, 5000, worker, [minidb_coverage_fsm]},
   {ok, {{simple_one_for_one, 5, 10}, [CoverageFSM]}}.
 
 %%====================================================================

@@ -1,9 +1,9 @@
 %%%-------------------------------------------------------------------
-%% @doc riak_core_demo top level supervisor.
+%% @doc minidb top level supervisor.
 %% @end
 %%%-------------------------------------------------------------------
 
--module(riak_core_demo_sup).
+-module(minidb_sup).
 
 -behaviour(supervisor).
 
@@ -29,14 +29,14 @@ start_link() ->
 %% Child :: {Id,StartFunc,Restart,Shutdown,Type,Modules}
 init([]) ->
     VMaster = {
-      riak_core_demo_vnode_master,
-      {riak_core_vnode_master, start_link, [riak_core_demo_vnode]},
+      minidb_vnode_master,
+      {riak_core_vnode_master, start_link, [minidb_vnode]},
       permanent, 5000, worker, [riak_core_vnode_master]},
 
     CoverageFSMs = {
-      riak_core_demo_coverage_fsm_sup,
-      {riak_core_demo_coverage_fsm_sup, start_link, []},
-      permanent, infinity, supervisor, [riak_core_demo_coverage_fsm_sup]},
+      minidb_coverage_fsm_sup,
+      {minidb_coverage_fsm_sup, start_link, []},
+      permanent, infinity, supervisor, [minidb_coverage_fsm_sup]},
 
     {ok, {{one_for_one, 5, 10}, [VMaster, CoverageFSMs]}}.
 

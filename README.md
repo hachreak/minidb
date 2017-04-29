@@ -1,4 +1,4 @@
-riak_core_demo
+minidb
 ==============
 
 This is a riak demo application following the elixir tutorials by
@@ -21,14 +21,14 @@ Start the first node:
 
 ```bash
 rebar3 shell --name test1@127.0.0.1 --config config/vars_dev1.config
-1> application:ensure_all_started(riak_core_demo).
+1> application:ensure_all_started(minidb).
 ```
 
 Start the second node:
 
 ```bash
 rebar3 shell --name test2@127.0.0.1 --config config/vars_dev2.config
-1> application:ensure_all_started(riak_core_demo).
+1> application:ensure_all_started(minidb).
 ```
 
 Join the two nodes together (run from the first node):
@@ -43,7 +43,7 @@ Ping
 Test the ping (you can run from both nodes):
 
 ```erlang
-3> riak_core_demo:ping().
+3> minidb:ping().
 ```
 
 You should see messages from console like:
@@ -58,11 +58,11 @@ Get/Put values in the store
 ---------------------------
 
 ```erlang
-riak_core_demo:put(a, 1).
-riak_core_demo:put(b, 2).
+minidb:put(a, 1).
+minidb:put(b, 2).
 ...
-riak_core_demo:get(a).
-riak_core_demo:get(b).
+minidb:get(a).
+minidb:get(b).
 ```
 
 Handoff
@@ -82,7 +82,7 @@ to the first node.
 To reconnect again the second node, simply:
 
 ```erlang
-application:ensure_all_started(riak_core_demo).
+application:ensure_all_started(minidb).
 riak_core:join('test1@127.0.0.1').
 ```
 
@@ -97,8 +97,8 @@ After you insert many data in the store, try to get the list of keys stored in
 all nodes or list of values:
 
 ```erlang
-riak_core_demo:keys().
-riak_core_demo:values().
+minidb:keys().
+minidb:values().
 ```
 
 Cluster status
@@ -107,5 +107,5 @@ Cluster status
 Show cluster status:
 
 ```erlang
-riak_core_demo:status().
+minidb:status().
 ```

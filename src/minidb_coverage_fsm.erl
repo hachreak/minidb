@@ -1,9 +1,9 @@
 %%%-------------------------------------------------------------------
-%% @doc riak_core_demo coverage fsm
+%% @doc minidb coverage fsm
 %% @end
 %%%-------------------------------------------------------------------
 
--module(riak_core_demo_coverage_fsm).
+-module(minidb_coverage_fsm).
 
 -behaviour(riak_core_coverage_fsm).
 
@@ -35,9 +35,9 @@ init(_From, [ReqId, From, What, Timeout]=Args) ->
     ?N_VAL,
     ?VNODE_COVERAGE,
     % service used to identify the running nodes
-    riak_core_demo,
+    minidb,
     % and the module that implements the vnode
-    riak_core_demo_vnode_master,
+    minidb_vnode_master,
     Timeout,
     riak_core_coverage_plan,
     % FSM state
