@@ -7,6 +7,7 @@
 
 -export([
   delete/1,
+  drop/0,
   get/1,
   inc/2,
   keys/0,
@@ -48,6 +49,12 @@ keys() ->
 values() ->
   ReqId = minidb_coverage_fsm_sup:start_fsm(values),
   wait_result(ReqId).
+
+drop() ->
+  ReqId = minidb_coverage_fsm_sup:start_fsm(drop),
+  DropResult = wait_result(ReqId),
+  ValuesDropped = lists:foldl(fun(X, Sum) -> X + Sum end, 0, DropResult),
+  error_logger:info_msg("values dropped: ~p~n", [ValuesDropped]).
 
 status() ->
   % show the ring status.

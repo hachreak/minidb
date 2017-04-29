@@ -117,6 +117,10 @@ handle_coverage({values, _, _}=Req, _KeySpaces, {_, RefId, _}=Sender,
   error_logger:info_msg(
     "[handle coverage] vnode values req ~p sender ~p~n", [Req, Sender]),
   {reply, {RefId, maps:values(Data)}, State};
+handle_coverage({drop, _, _}, _KeySpaces, {_, RefId, _},
+                State=#state{data=Data}) ->
+  error_logger:info_msg("[handle coverage] drop db~n"),
+  {reply, {RefId, maps:size(Data)}, State#state{data=#{}}};
 handle_coverage(Req, _KeySpaces, _Sender, State) ->
   error_logger:info_msg(
     "[handle coverage] Request ~p not implemented!", [Req]),
