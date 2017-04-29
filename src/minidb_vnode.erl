@@ -126,6 +126,16 @@ handle_coverage({drop, _, _}, _KeySpaces, {_, RefId, _},
                 State=#state{data=Data}) ->
   error_logger:info_msg("[handle coverage] drop db~n"),
   {reply, {RefId, maps:size(Data)}, State#state{data=#{}}};
+handle_coverage({{find, Queries}, _, _}, _KeySpaces, {_, RefId, _},
+                State=#state{data=Data}) ->
+  error_logger:info_msg("[handle coverage] find ~p~n", [Queries]),
+  Filtered = maps:fold(fun(Key, Value, Acc) ->
+      case check_constrains(Value, Queries) of
+        true -> Acc ++ [{Key, Value}];
+        false -> Acc
+      end
+    end, [], Data),
+  {reply, {RefId, Filtered}, State};
 handle_coverage(Req, _KeySpaces, _Sender, State) ->
   error_logger:info_msg(
     "[handle coverage] Request ~p not implemented!", [Req]),
@@ -137,3 +147,11 @@ handle_exit(_Pid, _Reason, State) ->
 terminate(_Reason, _State) ->
   ok.
 
+
+%% Private functions
+
+check_constrains(Value, Queries) ->
+  lists:all(fun({QueryKey, {Operator, QueryValue}}) ->
+      Value2Check = maps:get(QueryKey, Value, none),
+      minidb_query_operators:Operator(Value2Check, QueryValue)
+    end, Queries).
