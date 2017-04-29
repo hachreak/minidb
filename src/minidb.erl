@@ -8,6 +8,7 @@
 -export([
   delete/1,
   get/1,
+  inc/2,
   keys/0,
   ping/0,
   put/2,
@@ -35,6 +36,10 @@ get(Key) ->
 delete(Key) ->
   riak_core_vnode_master:command(
     get_node({?MODULE, Key}), {delete, Key}, minidb_vnode_master).
+
+inc(Key, Query) ->
+  riak_core_vnode_master:command(
+    get_node({?MODULE, Key}), {inc, Key, Query}, minidb_vnode_master).
 
 keys() ->
   ReqId = minidb_coverage_fsm_sup:start_fsm(keys),

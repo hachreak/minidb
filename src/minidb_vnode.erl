@@ -51,6 +51,13 @@ handle_command({put, {Key, Value}}, _Sender, State=#state{data=Data}) ->
 handle_command({get, Key}, _Sender, State=#state{data=Data}) ->
   error_logger:info_msg("[get] ~p~n", [Key]),
   {reply, maps:get(Key, Data), State};
+handle_command({inc, Key, Query}, _Sender, State=#state{data=Data}) ->
+  error_logger:info_msg("[inc] ~p -> ~p~n", [Key, Query]),
+  FinalValue = lists:foldl(fun({SubKey, Amount}, Value) ->
+      NewValue = maps:get(SubKey, Value, 0) + Amount,
+      Value#{SubKey => NewValue}
+    end, maps:get(Key, Data, #{}), Query),
+  {noreply, State#state{data=Data#{Key => FinalValue}}};
 handle_command({delete, Key}, _Sender, State=#state{data=Data}) ->
   error_logger:info_msg("[delete] ~p~n", [Key]),
   {noreply, State#state{data=maps:remove(Key, Data)}};
