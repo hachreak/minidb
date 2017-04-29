@@ -48,6 +48,11 @@ handle_command(ping, Sender, State) ->
 handle_command({put, {Key, Value}}, _Sender, State=#state{data=Data}) ->
   error_logger:info_msg("[put] ~p -> ~p~n", [Key, Value]),
   {noreply, State#state{data=Data#{Key => Value}}};
+handle_command({patch, {Key, Patch}}, _Sender, State=#state{data=Data}) ->
+  error_logger:info_msg("[patch] ~p -> ~p~n", [Key, Patch]),
+  Value = maps:get(Key, Data, #{}),
+  FinalValue = maps:merge(Value, Patch),
+  {noreply, State#state{data=Data#{Key => FinalValue}}};
 handle_command({get, Key}, _Sender, State=#state{data=Data}) ->
   error_logger:info_msg("[get] ~p~n", [Key]),
   {reply, maps:get(Key, Data), State};

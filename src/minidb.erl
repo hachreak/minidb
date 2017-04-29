@@ -11,6 +11,7 @@
   get/1,
   inc/2,
   keys/0,
+  patch/2,
   ping/0,
   put/2,
   status/0,
@@ -29,6 +30,10 @@ ping() ->
 put(Key, Value) ->
   riak_core_vnode_master:command(
     get_node({?MODULE, Key}), {put, {Key, Value}}, minidb_vnode_master).
+
+patch(Key, Patch) ->
+  riak_core_vnode_master:command(
+    get_node({?MODULE, Key}), {patch, {Key, Patch}}, minidb_vnode_master).
 
 get(Key) ->
   riak_core_vnode_master:sync_command(
