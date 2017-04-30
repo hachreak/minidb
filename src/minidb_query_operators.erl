@@ -22,7 +22,7 @@
 
 '$eq'(Value1, Value2) -> Value1 =:= Value2.
 
-'$gt'(Value1, Value2) -> are_numbers(Value1, Value2) and (Value1 > Value2).
+'$gt'(Value1, Value2) -> Value1 > Value2.
 
 '$gte'(Value1, Value2) -> '$gt'(Value1, Value2) or '$eq'(Value1, Value2).
 
@@ -35,5 +35,3 @@
 %%====================================================================
 %% Internal functions
 %%====================================================================
-
-are_numbers(Value1, Value2) -> is_number(Value1) and is_number(Value2).
