@@ -33,7 +33,7 @@ start_vnode(I) ->
   riak_core_vnode_master:get_vnode_pid(I, ?MODULE).
 
 init([Partition]) ->
-  {ok, #state { partition=Partition, data=#{}}}.
+  {ok, #state {partition=Partition, data=minidb_db:init()}}.
 
 handle_overload_command(_, _, _) ->
   lager:warning("[VNODE] Overload command!~n").
@@ -47,25 +47,19 @@ handle_command(ping, Sender, State) ->
   {reply, {pong, State#state.partition}, State};
 handle_command({put, {Key, Value}}, _Sender, State=#state{data=Data}) ->
   error_logger:info_msg("[put] ~p -> ~p~n", [Key, Value]),
-  {noreply, State#state{data=Data#{Key => Value}}};
+  {noreply, State#state{data=minidb_db:put(Key, Value, Data)}};
 handle_command({patch, {Key, Patch}}, _Sender, State=#state{data=Data}) ->
   error_logger:info_msg("[patch] ~p -> ~p~n", [Key, Patch]),
-  Value = maps:get(Key, Data, #{}),
-  FinalValue = maps:merge(Value, Patch),
-  {noreply, State#state{data=Data#{Key => FinalValue}}};
+  {noreply, State#state{data=minidb_db:patch(Key, Patch, Data)}};
 handle_command({get, Key}, _Sender, State=#state{data=Data}) ->
   error_logger:info_msg("[get] ~p~n", [Key]),
-  {reply, maps:get(Key, Data), State};
-handle_command({inc, Key, Query}, _Sender, State=#state{data=Data}) ->
-  error_logger:info_msg("[inc] ~p -> ~p~n", [Key, Query]),
-  FinalValue = lists:foldl(fun({SubKey, Amount}, Value) ->
-      NewValue = maps:get(SubKey, Value, 0) + Amount,
-      Value#{SubKey => NewValue}
-    end, maps:get(Key, Data, #{}), Query),
-  {noreply, State#state{data=Data#{Key => FinalValue}}};
+  {reply, minidb_db:get(Key, Data), State};
+handle_command({inc, Key, Queries}, _Sender, State=#state{data=Data}) ->
+  error_logger:info_msg("[inc] ~p -> ~p~n", [Key, Queries]),
+  {noreply, State#state{data=minidb_db:inc(Key, Queries, Data)}};
 handle_command({delete, Key}, _Sender, State=#state{data=Data}) ->
   error_logger:info_msg("[delete] ~p~n", [Key]),
-  {noreply, State#state{data=maps:remove(Key, Data)}};
+  {noreply, State#state{data=minidb_db:delete(Key, Data)}};
 handle_command(Message, _Sender, State) ->
   lager:warning("unhandled_command ~p", [Message]),
   {noreply, State}.
@@ -73,7 +67,7 @@ handle_command(Message, _Sender, State) ->
 handle_handoff_command(?FOLD_REQ{foldfun=FoldFun, acc0=Acc0}, _Sender,
                        State=#state{partition=Partition, data=Data}) ->
   error_logger:info_msg("[handoff v2] partition ~p~n", [Partition]),
-  AccFinal = maps:fold(fun(Key, Value, Acc) ->
+  AccFinal = minidb_db:fold(fun(Key, Value, Acc) ->
       FoldFun(Key, Value, Acc)
     end, Acc0, Data),
   {reply, AccFinal, State};
@@ -94,48 +88,35 @@ handoff_finished(TargetNode, State) ->
   error_logger:info_msg("[Handoff] finish from ~p~n", [TargetNode]),
   {ok, State}.
 
-handle_handoff_data(BinaryData, State=#state{data=Data}) ->
+handle_handoff_data(BinaryKV, State=#state{data=Data}) ->
   % Receive handoff data from the node that is switched off and decode it
-  {Key, Value} = erlang:binary_to_term(BinaryData),
-  {reply, ok, State#state{data=Data#{Key => Value}}}.
+  {reply, ok, State#state{data=minidb_db:import(BinaryKV, Data)}}.
 
 encode_handoff_item(Key, Value) ->
   % encode the data in a format that can be then transferred and then decoded
   % on other nodes.
-  erlang:term_to_binary({Key, Value}).
+  minidb_db:export(Key, Value).
 
 is_empty(State=#state{data=Data}) ->
   % if true, the handoff procedure is started!
-  {maps:size(Data) =:= 0, State}.
+  {minidb_db:is_empty(Data), State}.
 
-delete(State) ->
+delete(State=#state{data=Data}) ->
   % called before the termination of the vnode and is used to clean the data
-  {ok, State#state{data=#{}}}.
+  {ok, State#state{data=minidb_db:drop(Data)}}.
 
-handle_coverage({keys, _, _}=Req, _KeySpaces, {_, RefId, _}=Sender,
+handle_coverage({keys, _, _}, _KeySpaces, {_, RefId, _},
                 State=#state{data=Data}) ->
-  error_logger:info_msg(
-    "[handle coverage] vnode keys req ~p sender ~p~n", [Req, Sender]),
-  {reply, {RefId, maps:keys(Data)}, State};
-handle_coverage({values, _, _}=Req, _KeySpaces, {_, RefId, _}=Sender,
+  {reply, {RefId, minidb_db:keys(Data)}, State};
+handle_coverage({values, _, _}, _KeySpaces, {_, RefId, _},
                 State=#state{data=Data}) ->
-  error_logger:info_msg(
-    "[handle coverage] vnode values req ~p sender ~p~n", [Req, Sender]),
-  {reply, {RefId, maps:values(Data)}, State};
+  {reply, {RefId, minidb_db:values(Data)}, State};
 handle_coverage({drop, _, _}, _KeySpaces, {_, RefId, _},
                 State=#state{data=Data}) ->
-  error_logger:info_msg("[handle coverage] drop db~n"),
-  {reply, {RefId, maps:size(Data)}, State#state{data=#{}}};
+  {reply, {RefId, minidb_db:size(Data)}, State#state{data=#{}}};
 handle_coverage({{find, Queries}, _, _}, _KeySpaces, {_, RefId, _},
                 State=#state{data=Data}) ->
-  error_logger:info_msg("[handle coverage] find ~p~n", [Queries]),
-  Filtered = maps:fold(fun(Key, Value, Acc) ->
-      case check_constrains(Value, Queries) of
-        true -> Acc ++ [{Key, Value}];
-        false -> Acc
-      end
-    end, [], Data),
-  {reply, {RefId, Filtered}, State};
+  {reply, {RefId, minidb_db:find(Queries, Data)}, State};
 handle_coverage(Req, _KeySpaces, _Sender, State) ->
   error_logger:info_msg(
     "[handle coverage] Request ~p not implemented!", [Req]),
@@ -147,11 +128,4 @@ handle_exit(_Pid, _Reason, State) ->
 terminate(_Reason, _State) ->
   ok.
 
-
 %% Private functions
-
-check_constrains(Value, Queries) ->
-  lists:all(fun({QueryKey, {Operator, QueryValue}}) ->
-      Value2Check = maps:get(QueryKey, Value, none),
-      minidb_query_operators:Operator(Value2Check, QueryValue)
-    end, Queries).

@@ -46,12 +46,12 @@ init(_From, [ReqId, From, What, Timeout]=Args) ->
 
 process_results({_Partition, Value}, #{result := Result}=State) ->
   % called for every response received from the vnode.
-  error_logger:info_msg(
-    "[CoverateFsm] Process result, ~nValue: ~p~n", [Value]),
+  % error_logger:info_msg(
+  %   "[CoverateFsm] Process result, ~nValue: ~p~n", [Value]),
   {done, State#{result => [Value | Result]}}.
 
 finish(clean, #{from := From, reqid := ReqId, result := Result}=State) ->
-  error_logger:info_msg("[CoverateFsm] Finish~ninspect state:~n~p~n", [State]),
+  % error_logger:info_msg("[CoverateFsm] Finish~ninspect state:~n~p~n", [State]),
   From ! {ReqId, {ok, lists:flatten(Result)}},
   {stop, normal, State};
 finish({error, Reason}, #{from :=From, reqid := ReqId}=State) ->
