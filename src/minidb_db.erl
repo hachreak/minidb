@@ -42,9 +42,9 @@ patch(Key, Patch, Data) ->
 get(Key, Data) -> maps:get(Key, Data).
 
 find(Queries, Data) ->
-  maps:fold(fun(Key, Value, Acc) ->
+  maps:fold(fun(_Key, Value, Acc) ->
         case check_constrains(Value, Queries) of
-          true -> Acc ++ [{Key, Value}];
+          true -> Acc ++ [Value];
           false -> Acc
         end
       end, [], Data).
