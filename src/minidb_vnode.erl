@@ -1,4 +1,7 @@
 -module(minidb_vnode).
+
+-author('Leonardo Rossi <leonardo.rossi@studenti.unipr.it>').
+
 -behaviour(riak_core_vnode).
 
 -export([

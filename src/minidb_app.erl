@@ -5,6 +5,8 @@
 
 -module(minidb_app).
 
+-author('Leonardo Rossi <leonardo.rossi@studenti.unipr.it>').
+
 -behaviour(application).
 
 %% Application callbacks

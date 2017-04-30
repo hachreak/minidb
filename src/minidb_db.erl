@@ -5,6 +5,8 @@
 
 -module(minidb_db).
 
+-author('Leonardo Rossi <leonardo.rossi@studenti.unipr.it>').
+
 -export([
   all/1,
   delete/2,

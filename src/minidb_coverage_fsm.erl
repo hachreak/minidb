@@ -5,6 +5,8 @@
 
 -module(minidb_coverage_fsm).
 
+-author('Leonardo Rossi <leonardo.rossi@studenti.unipr.it>').
+
 -behaviour(riak_core_coverage_fsm).
 
 -define(TIMEOUT, 5000).

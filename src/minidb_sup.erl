@@ -5,6 +5,8 @@
 
 -module(minidb_sup).
 
+-author('Leonardo Rossi <leonardo.rossi@studenti.unipr.it>').
+
 -behaviour(supervisor).
 
 %% API

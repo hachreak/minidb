@@ -5,6 +5,8 @@
 
 -module(minidb_query_operators).
 
+-author('Leonardo Rossi <leonardo.rossi@studenti.unipr.it>').
+
 -export([
   '$eq'/2,
   '$gt'/2,
