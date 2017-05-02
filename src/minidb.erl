@@ -13,7 +13,9 @@
   find/1,
   get/1,
   inc/2,
+  join/1,
   keys/0,
+  leave/0,
   patch/2,
   ping/0,
   put/2,
@@ -72,6 +74,10 @@ status() ->
   % show the ring status.
   {ok, Ring} = riak_core_ring_manager:get_my_ring(),
   riak_core_ring:pretty_print(Ring, [legend]).
+
+join(BootstrapNode) -> riak_core:join(BootstrapNode).
+
+leave() -> riak_core:leave().
 
 %% Private functions
 

@@ -1,13 +1,7 @@
 minidb
 ==============
 
-This is a riak demo application following the elixir tutorials by
-[Gpad](https://github.com/gpad/no_slides) and adapting them to erlang
-
-([Part 1](https://medium.com/@GPad/create-a-riak-core-application-in-elixir-part-1-41354c1f26c3),
-[Part 2](https://medium.com/@GPad/create-a-riak-core-application-in-elixir-part-2-88bdec73f368),
-[Part 3](https://medium.com/@GPad/create-a-riak-core-application-in-elixir-part-3-8bac36632be0),
-[Part 4](https://medium.com/@GPad/create-a-riak-core-application-in-elixir-part-4-728512ece224))
+This is a minimal in-memory distributed master-less document database database.
 
 Build
 -----
@@ -19,23 +13,14 @@ Run demo
 
 Start the first node:
 
-```bash
-rebar3 shell --name test1@127.0.0.1 --config config/vars_dev1.config
-1> application:ensure_all_started(minidb).
-```
+    $ make node1
 
 Start the second node:
 
-```bash
-rebar3 shell --name test2@127.0.0.1 --config config/vars_dev2.config
-1> application:ensure_all_started(minidb).
-```
+    $ make node2
+    > minidb:join('test1@127.0.0.1').
 
-Join the two nodes together (run from the first node):
-
-```erlang
-2> riak_core:join('test2@127.0.0.1').
-```
+The second node will automatically connect to the first in a cluster.
 
 Ping
 ----
