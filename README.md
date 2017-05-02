@@ -36,7 +36,7 @@ API
 
 - Create/Update a key: `minidb:put(key, value)`
 - Patch a value: `minidb:patch(key, {subkey1, subvalue1})`
-- Read a value: `minidb:get(key)`
+- Read a value: `minidb:get(key)` or `minidb:get(key, default)`
 - Query database: `minidb:find([..])`
 - Get all keys: `minidb:keys()`
 - Delete a key: `minidb:delete`

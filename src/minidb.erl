@@ -12,6 +12,7 @@
   drop/0,
   find/1,
   get/1,
+  get/2,
   inc/2,
   join/1,
   keys/0,
@@ -43,6 +44,10 @@ patch(Key, Patch) ->
 get(Key) ->
   riak_core_vnode_master:sync_command(
     get_node({?MODULE, Key}), {get, Key}, minidb_vnode_master).
+
+get(Key, Default) ->
+  riak_core_vnode_master:sync_command(
+    get_node({?MODULE, Key}), {get, Key, Default}, minidb_vnode_master).
 
 delete(Key) ->
   riak_core_vnode_master:command(

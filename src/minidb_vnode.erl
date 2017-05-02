@@ -57,6 +57,9 @@ handle_command({patch, {Key, Patch}}, _Sender, State=#state{data=Data}) ->
 handle_command({get, Key}, _Sender, State=#state{data=Data}) ->
   error_logger:info_msg("[get] ~p~n", [Key]),
   {reply, minidb_db:get(Key, Data), State};
+handle_command({get, Key, Default}, _Sender, State=#state{data=Data}) ->
+  error_logger:info_msg("[get] ~p default ~p~n", [Key, Default]),
+  {reply, minidb_db:get(Key, Data, Default), State};
 handle_command({inc, Key, Queries}, _Sender, State=#state{data=Data}) ->
   error_logger:info_msg("[inc] ~p -> ~p~n", [Key, Queries]),
   {noreply, State#state{data=minidb_db:inc(Key, Queries, Data)}};

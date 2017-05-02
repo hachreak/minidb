@@ -15,6 +15,7 @@
   find/2,
   fold/2,
   get/2,
+  get/3,
   import/2,
   inc/3,
   init/0,
@@ -39,7 +40,9 @@ patch(Key, Patch, Data) ->
   FinalValue = maps:merge(Value, Patch),
   Data#{Key => FinalValue}.
 
-get(Key, Data) -> maps:get(Key, Data).
+get(Key, Data) -> get(Key, Data, none).
+
+get(Key, Data, Default) -> maps:get(Key, Data, Default).
 
 find(Queries, Data) ->
   maps:fold(fun(_Key, Value, Acc) ->
