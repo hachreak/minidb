@@ -22,75 +22,41 @@ Start the second node:
 
 The second node will automatically connect to the first in a cluster.
 
-Ping
-----
+API
+---
 
-Test the ping (you can run from both nodes):
+#### Cluster:
 
-```erlang
-3> minidb:ping().
-```
+- Ping: `minidb:ping()`
+- Join a cluster: `minidb:join('bootstrap_node')`
+- Leave a cluster: `minidb:leave()`
+- Cluster status: `minidb:status()`
 
-You should see messages from console like:
+#### CRUD:
 
-`{pong, ....}`
+- Create/Update a key: `minidb:put(key, value)`
+- Patch a value: `minidb:patch(key, {subkey1, subvalue1})`
+- Read a value: `minidb:get(key)`
+- Query database: `minidb:find([..])`
+- Get all keys: `minidb:keys()`
+- Delete a key: `minidb:delete`
+- Drop everything: `minidb:drop()`
 
-and in one of the two nodes (it's pseudo random) a message like:
+#### Query:
 
-`[ping received] from ...`
+The query language is similar to the one used by mongodb:
 
-Get/Put values in the store
----------------------------
+`minidb:find([{"section", {'$eq', "books"}}, {"likes", {'$gt', 100}])`
 
-```erlang
-minidb:put(a, 1).
-minidb:put(b, 2).
-...
-minidb:get(a).
-minidb:get(b).
-```
+Operators available:
 
-Handoff
--------
+Op.           | Name              | Example
+--------------|-------------------|------------------------------------------
+`'$eq'`       | Equals            | {"section", {'$eq', "books"}}
+`'$ne'`       | Not Equals        | {"section", {'$ne', "books"}}
+`'$gt'`       | Greater Than      | {"likes", {'$gt', 100}}
+`'$gte'`      | Greater or Equals | {"likes", {'$gte', 100}}
+`'$lt'`       | Lower Than        | {"likes", {'$lt', 100}}
+`'$lte'`      | Lower or Equals   | {"likes", {'$lte', 100}}
 
-After you insert many data in the store, just try to disconnect
-the second node from the cluster:
-
-```erlang
-riak_core:leave().
-```
-
-In the console you should be able to see the different messages.
-Automatically, all information stored in the second node will be transfered
-to the first node.
-
-To reconnect again the second node, simply:
-
-```erlang
-application:ensure_all_started(minidb).
-riak_core:join('test1@127.0.0.1').
-```
-
-Again, you will see the handoff of some process from the first node and
-part of the data will be transfered to the second node.
-
-
-Coverage commands: keys() and values()
---------------------------------------
-
-After you insert many data in the store, try to get the list of keys stored in
-all nodes or list of values:
-
-```erlang
-minidb:keys().
-minidb:values().
-```
-
-Cluster status
---------------
-
-Show cluster status:
-
-```erlang
-minidb:status().
-```
+Note: to get everything: `minidb:find([])`.
