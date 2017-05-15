@@ -13,7 +13,7 @@
   drop/1,
   export/2,
   find/2,
-  fold/2,
+  fold/3,
   get/2,
   get/3,
   import/2,
@@ -61,7 +61,7 @@ inc(Key, Queries, Data) ->
 
 delete(Key, Data) -> maps:remove(Key, Data).
 
-fold(Fun, Data) -> maps:fold(Fun, Data).
+fold(Fun, Init, Data) -> maps:fold(Fun, Init, Data).
 
 import(BinaryKV, Data) ->
   {Key, Value} = erlang:binary_to_term(BinaryKV),
