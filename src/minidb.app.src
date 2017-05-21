@@ -1,6 +1,6 @@
 {application, minidb,
  [{description, "An OTP application"},
-  {vsn, "0.1.1"},
+  {vsn, "0.2.0"},
   {registered, []},
   {mod, { minidb_app, []}},
   {applications,
