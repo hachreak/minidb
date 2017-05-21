@@ -3,34 +3,18 @@ minidb
 
 This is a minimal in-memory distributed master-less document database database.
 
-Build
------
-
-    $ rebar3 compile
-
-Run demo
---------
-
-Start the first node:
-
-    $ make node1
-
-Start the second node:
-
-    $ make node2
-    > minidb:join('test1@127.0.0.1').
-
-The second node will automatically connect to the first in a cluster.
-
 API
 ---
 
 #### Cluster:
 
-- Ping: `minidb:ping()`
-- Join a cluster: `minidb:join('bootstrap_node')`
-- Leave a cluster: `minidb:leave()`
-- Cluster status: `minidb:status()`
+- Auto-cluster: automatically create a cluster specified in the configuration
+    `minidb_cluster:join()`, or manually make a cluster passing a list of
+    seeds `minidb_cluster:make([bootstrap_node1])`.
+- Cluster status: `minidb_cluster:status()`
+- Join a cluster: `minidb_cluster:join('bootstrap_node')`
+- Leave a cluster: `minidb_cluster:leave()`
+- Ping a random node: `minidb:ping()`
 
 #### CRUD:
 
@@ -60,3 +44,26 @@ Op.           | Name              | Example
 `'$lte'`      | Lower or Equals   | {"likes", {'$lte', 100}}
 
 Note: to get everything: `minidb:find([])`.
+
+Build
+-----
+
+    $ rebar3 compile
+
+Run demo
+--------
+
+Start the first node:
+
+    $ make node1
+
+Start the second node:
+
+    $ make node2
+
+After 5 seconds, the second node will automatically connect to the first in a
+cluster.
+
+To clean all the configuration (cluster informations):
+
+    $ make clean

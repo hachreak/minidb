@@ -21,6 +21,7 @@ start(_StartType, _StartArgs) ->
     {ok, Pid} ->
       ok = riak_core:register([{vnode_module, minidb_vnode}]),
       ok = riak_core_node_watcher:service_up(minidb, self()),
+      minidb_cluster:auto_join(),
       {ok, Pid};
     {error, Reason} -> {error, Reason}
   end.
