@@ -1,9 +1,9 @@
 %%%-------------------------------------------------------------------
-%% @doc minidb query operators
+%% @doc minidb memory query operators
 %% @end
 %%%-------------------------------------------------------------------
 
--module(minidb_query_operators).
+-module(minidb_db_mem_query_op).
 
 -author('Leonardo Rossi <leonardo.rossi@studenti.unipr.it>').
 

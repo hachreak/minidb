@@ -3,7 +3,7 @@
 %% @end
 %%%-------------------------------------------------------------------
 
--module(minidb_db).
+-module(minidb_db_mem).
 
 -author('Leonardo Rossi <leonardo.rossi@studenti.unipr.it>').
 
@@ -86,5 +86,5 @@ size(Data) -> maps:size(Data).
 check_constrains(Value, Queries) ->
   lists:all(fun({QueryKey, {Operator, QueryValue}}) ->
       Value2Check = maps:get(QueryKey, Value, none),
-      minidb_query_operators:Operator(Value2Check, QueryValue)
+      minidb_db_mem_query_op:Operator(Value2Check, QueryValue)
     end, Queries).
