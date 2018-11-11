@@ -11,14 +11,12 @@
   all/1,
   delete/2,
   drop/1,
-  export/2,
   find/2,
   fold/3,
   get/2,
   get/3,
-  import/2,
   inc/3,
-  init/0,
+  init/1,
   is_empty/1,
   keys/1,
   patch/3,
@@ -31,7 +29,7 @@
 %% API
 %%====================================================================
 
-init() -> #{}.
+init(_) -> #{}.
 
 put(Key, Value, Data) -> Data#{Key => Value}.
 
@@ -62,12 +60,6 @@ inc(Key, Queries, Data) ->
 delete(Key, Data) -> maps:remove(Key, Data).
 
 fold(Fun, Init, Data) -> maps:fold(Fun, Init, Data).
-
-import(BinaryKV, Data) ->
-  {Key, Value} = erlang:binary_to_term(BinaryKV),
-  Data#{Key => Value}.
-
-export(Key, Value) -> erlang:term_to_binary({Key, Value}).
 
 is_empty(Data) -> maps:size(Data) =:= 0.
 
