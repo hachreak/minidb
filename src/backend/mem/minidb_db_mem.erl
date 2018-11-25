@@ -44,7 +44,7 @@ get(Key, Data, Default) -> maps:get(Key, Data, Default).
 
 find(Queries, Data) ->
   maps:fold(fun(_Key, Value, Acc) ->
-        case check_constrains(Value, Queries) of
+        case check_constraints(Value, Queries) of
           true -> Acc ++ [Value];
           false -> Acc
         end
@@ -75,7 +75,7 @@ size(Data) -> maps:size(Data).
 
 %% Private functions
 
-check_constrains(Value, Queries) ->
+check_constraints(Value, Queries) ->
   lists:all(fun({QueryKey, {Operator, QueryValue}}) ->
       Value2Check = maps:get(QueryKey, Value, none),
       minidb_db_mem_query_op:Operator(Value2Check, QueryValue)
