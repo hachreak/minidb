@@ -30,7 +30,7 @@ API
 
 The query language is similar to the one used by mongodb:
 
-`minidb:find([{"section", {'$eq', "books"}}, {"likes", {'$gt', 100}])`
+`minidb:find([{"section", {'$eq', "books"}}, {"likes", {'$gt', 100}}])`
 
 Operators available:
 
